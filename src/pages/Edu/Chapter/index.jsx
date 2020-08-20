@@ -15,6 +15,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import { connect } from "react-redux";
 import SearchForm from "./SearchForm";
+import { getLessonList } from "./redux";
 
 import "./index.less";
 
@@ -27,8 +28,9 @@ dayjs.extend(relativeTime);
     //   state.course.permissionValueList,
     //   "Course"
     // )
-  })
-  // { getcourseList }
+    chapterList: state.chapterList,
+  }),
+  { getLessonList }
 )
 class Chapter extends Component {
   state = {
@@ -90,6 +92,12 @@ class Chapter extends Component {
     });
   };
 
+  handleGetLesson = (expand, record) => {
+    if (expand) {
+      this.props.getLessonList(record._id);
+    }
+  };
+
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
@@ -106,16 +114,26 @@ class Chapter extends Component {
         },
       },
       {
+        title: "视频",
+        // dataIndex: "free",
+        render: (record) => {
+          if (record.free) {
+            return <Button>预览</Button>;
+          }
+          return null;
+        },
+      },
+      {
         title: "操作",
-        width: 300,
+        width: 210,
         fixed: "right",
         render: (data) => {
           if ("free" in data) {
             return (
               <div>
-                <Tooltip title="查看详情">
-                  <Button>
-                    <SettingOutlined />
+                <Tooltip title="新增课时">
+                  <Button type="primary">
+                    <PlusOutlined />
                   </Button>
                 </Tooltip>
                 <Tooltip title="更新章节">
@@ -247,7 +265,6 @@ class Chapter extends Component {
       //   }
       // ]
     };
-
     return (
       <div>
         <div className="course-search">
@@ -290,8 +307,11 @@ class Chapter extends Component {
           <Table
             rowSelection={rowSelection}
             columns={columns}
-            dataSource={data}
-            rowKey="id"
+            dataSource={this.props.chapterList}
+            rowKey="_id"
+            expandable={{
+              onExpand: this.handleGetLesson,
+            }}
           />
         </div>
 
