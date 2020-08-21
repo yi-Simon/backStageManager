@@ -98,8 +98,10 @@ class Chapter extends Component {
     }
   };
 
+  handleAdd = (data) => () => {
+    this.props.history.push("/edu/chapter/addlesson", data);
+  };
   render() {
-    console.log(this.props);
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
     const columns = [
@@ -129,27 +131,25 @@ class Chapter extends Component {
         width: 210,
         fixed: "right",
         render: (data) => {
-          if ("free" in data) {
-            return (
-              <div>
-                <Tooltip title="新增课时">
-                  <Button type="primary">
-                    <PlusOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="更新章节">
-                  <Button type="primary" style={{ margin: "0 10px" }}>
-                    <FormOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="删除章节">
-                  <Button type="danger">
-                    <DeleteOutlined />
-                  </Button>
-                </Tooltip>
-              </div>
-            );
-          }
+          return (
+            <div>
+              <Tooltip title="新增课时">
+                <Button type="primary" onClick={this.handleAdd(data)}>
+                  <PlusOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="更新章节">
+                <Button type="primary" style={{ margin: "0 10px" }}>
+                  <FormOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="删除章节">
+                <Button type="danger">
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            </div>
+          );
         },
       },
     ];
