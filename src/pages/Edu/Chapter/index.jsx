@@ -28,7 +28,7 @@ dayjs.extend(relativeTime);
     //   state.course.permissionValueList,
     //   "Course"
     // )
-    chapterList: state.chapterList,
+    chapterList: state.chapter.chapterList,
   }),
   { getLessonList }
 )
@@ -99,6 +99,7 @@ class Chapter extends Component {
   };
 
   render() {
+    console.log(this.props);
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
     const columns = [
