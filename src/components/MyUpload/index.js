@@ -8,13 +8,17 @@ import * as qiniu from "qiniu-js";
 export default class MyUpload extends Component {
   constructor() {
     super();
+    this.state = {
+      isShowUpload: true,
+    };
     const jsonStr = localStorage.getItem("UPLOAD_TOKEN");
     if (jsonStr) {
       this.tokenObj = JSON.parse(jsonStr);
-      return;
+    } else {
+      this.tokenObj = {};
     }
-    this.tokenObj = {};
   }
+
   handleBeforeUpload = (file, fileList) => {
     const MAX_SIZE = 20 * 1024 * 1024;
 
@@ -49,8 +53,10 @@ export default class MyUpload extends Component {
       },
       // 上传成功触发的回调函数
       complete: (res) => {
+        this.setState({ isShowUpload: false });
         console.log("上传完成");
         onSuccess(res);
+
         this.props.onChange("http://qfekzkjt3.hn-bkt.clouddn.com/" + res.key);
       },
     };
@@ -71,6 +77,7 @@ export default class MyUpload extends Component {
   }
   handleRemove = () => {
     this.props.onChange("");
+    this.setState({ isShowUpload: true });
   };
   render() {
     return (
@@ -79,10 +86,13 @@ export default class MyUpload extends Component {
           beforeUpload={this.handleBeforeUpload}
           customRequest={this.handlecustomRequest}
           onRemove={this.handleRemove}
+          accept="video/*"
         >
-          <Button>
-            <UploadOutlined /> 上传视频
-          </Button>
+          {this.state.isShowUpload && (
+            <Button>
+              <UploadOutlined /> 上传视频
+            </Button>
+          )}
         </Upload>
       </>
     );

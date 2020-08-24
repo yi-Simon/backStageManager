@@ -1,79 +1,125 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Cascader, Button } from "antd";
+import { connect } from "react-redux";
 
+import { reqAllSubject, reqGetSecSubject } from "@api/edu/subject";
+import { reqGetAllTeacherList } from "@api/edu/teacher";
+import { getAllCourse } from "../redux";
 import "./index.less";
 
+import { FormattedMessage, useIntl } from "react-intl";
+
 const { Option } = Select;
+connect(
+  (state) => ({
+    courseList: state.courseList,
+  }),
+  { getAllCourse }
+)(SearchForm);
 
-function SearchForm() {
+function SearchForm(props) {
   const [form] = Form.useForm();
+  const [teachers, setTeacher] = useState([]);
+  const [subjects, setSubject] = useState([]);
+  const [options, setOption] = useState([]);
 
-  const [options, setOptions] = useState([
-    {
-      value: "zhejiang",
-      label: "Zhejiang",
-      isLeaf: false
-    },
-    {
-      value: "jiangsu",
-      label: "Jiangsu",
-      isLeaf: false
+  useEffect(() => {
+    async function fetchDate() {
+      const [subject, teacher] = await Promise.all([
+        reqAllSubject(),
+        reqGetAllTeacherList(),
+      ]);
+      setSubject(subject);
+      setTeacher(teacher);
+      const optionList = subject.map((item) => {
+        return {
+          value: item._id,
+          label: item.title,
+          isLeaf: false,
+        };
+      });
+      setOption(optionList);
     }
-  ]);
+    fetchDate();
+  }, []);
+
+  // const [options, setOptions] = useState([
+  //   {
+  //     value: "zhejiang",
+  //     label: "Zhejiang",
+  //     isLeaf: false,
+  //   },
+  //   {
+  //     value: "jiangsu",
+  //     label: "Jiangsu",
+  //     isLeaf: false,
+  //   },
+  // ]);
 
   const onChange = (value, selectedOptions) => {
-    console.log(value, selectedOptions);
+    console.log("多级联动", value, selectedOptions);
   };
 
-  const loadData = selectedOptions => {
+  const loadData = async (selectedOptions) => {
+    console.log("触发loadData");
     const targetOption = selectedOptions[selectedOptions.length - 1];
     targetOption.loading = true;
 
+    const res = await reqGetSecSubject(targetOption.value);
     // load options lazily
-    setTimeout(() => {
-      targetOption.loading = false;
-      targetOption.children = [
-        {
-          label: `${targetOption.label} Dynamic 1`,
-          value: "dynamic1"
-        },
-        {
-          label: `${targetOption.label} Dynamic 2`,
-          value: "dynamic2"
-        }
-      ];
-      setOptions([...options]);
-    }, 1000);
+
+    targetOption.loading = false;
+    if (res.items.length) {
+      targetOption.children = res.items.map((item) => {
+        return {
+          value: item._id,
+          label: item.title,
+        };
+      });
+    } else {
+      targetOption.isLeaf = true;
+    }
+    setOption([...options]);
   };
 
   const resetForm = () => {
     form.resetFields();
   };
 
+  const onFinish = () => {
+    console.log(props);
+  };
+
+  const intl = useIntl();
   return (
-    <Form layout="inline" form={form}>
-      <Form.Item name="title" label="标题">
-        <Input placeholder="课程标题" style={{ width: 250, marginRight: 20 }} />
+    <Form layout="inline" form={form} onFinish={onFinish}>
+      <Form.Item name="title" label={<FormattedMessage id="title" />}>
+        <Input
+          placeholder={intl.formatMessage({ id: "title" })}
+          style={{ width: 250, marginRight: 20 }}
+        ></Input>
       </Form.Item>
-      <Form.Item name="teacherId" label="讲师">
+      <Form.Item name="teacherId" label={<FormattedMessage id="teacher" />}>
         <Select
           allowClear
-          placeholder="课程讲师"
+          placeholder={intl.formatMessage({ id: "teacher" })}
           style={{ width: 250, marginRight: 20 }}
         >
-          <Option value="lucy1">Lucy1</Option>
-          <Option value="lucy2">Lucy2</Option>
-          <Option value="lucy3">Lucy3</Option>
+          {teachers.map((item) => (
+            <Option key={item._id} value={item._id}>
+              {item.name}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
-      <Form.Item name="subject" label="分类">
+      <Form.Item name="subject" label={<FormattedMessage id="subject" />}>
         <Cascader
           style={{ width: 250, marginRight: 20 }}
           options={options}
           loadData={loadData}
           onChange={onChange}
-          changeOnSelect
-          placeholder="课程分类"
+          // changeOnSelect
+          placeholder={intl.formatMessage({ id: "subject" })}
         />
       </Form.Item>
       <Form.Item>

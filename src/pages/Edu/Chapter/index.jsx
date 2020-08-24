@@ -15,7 +15,9 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import { connect } from "react-redux";
 import SearchForm from "./SearchForm";
-import { getLessonList } from "./redux";
+import { getLessonList, batchDelLesson, batchDelChapter } from "./redux";
+import Player from "griffith";
+import screenfull from "screenfull";
 
 import "./index.less";
 
@@ -30,7 +32,7 @@ dayjs.extend(relativeTime);
     // )
     chapterList: state.chapter.chapterList,
   }),
-  { getLessonList }
+  { getLessonList, batchDelLesson, batchDelChapter }
 )
 class Chapter extends Component {
   state = {
@@ -38,6 +40,7 @@ class Chapter extends Component {
     previewVisible: false,
     previewImage: "",
     selectedRowKeys: [],
+    play_url: "",
   };
 
   showImgModal = (img) => {
@@ -101,6 +104,26 @@ class Chapter extends Component {
   handleAdd = (data) => () => {
     this.props.history.push("/edu/chapter/addlesson", data);
   };
+  handlePreview = (record) => () => {
+    this.setState({ previewVisible: true, play_url: record.video });
+  };
+  handleBatchDel = async () => {
+    const chapterIds = [];
+    this.props.chapterList.forEach((item) => {
+      if (this.state.selectedRowKeys.indexOf(item._id) > -1) {
+        chapterIds.push(item._id);
+      }
+    });
+    const lessonIds = this.state.selectedRowKeys.filter((item) => {
+      if (chapterIds.indexOf(item) === -1) {
+        return item;
+      }
+    });
+    console.log(chapterIds, lessonIds);
+    await this.props.batchDelChapter(chapterIds);
+    await this.props.batchDelLesson(lessonIds);
+    message.success("批量删除成功");
+  };
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
@@ -121,7 +144,7 @@ class Chapter extends Component {
         // dataIndex: "free",
         render: (record) => {
           if (record.free) {
-            return <Button>预览</Button>;
+            return <Button onClick={this.handlePreview(record)}>预览</Button>;
           }
           return null;
         },
@@ -230,41 +253,25 @@ class Chapter extends Component {
     ];
 
     const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-      // hideDefaultSelections: true,
-      // selections: [
-      //   Table.SELECTION_ALL,
-      //   Table.SELECTION_INVERT,
-      //   {
-      //     key: "odd",
-      //     text: "Select Odd Row",
-      //     onSelect: changableRowKeys => {
-      //       let newSelectedRowKeys = [];
-      //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-      //         if (index % 2 !== 0) {
-      //           return false;
-      //         }
-      //         return true;
-      //       });
-      //       this.setState({ selectedRowKeys: newSelectedRowKeys });
-      //     }
-      //   },
-      //   {
-      //     key: "even",
-      //     text: "Select Even Row",
-      //     onSelect: changableRowKeys => {
-      //       let newSelectedRowKeys = [];
-      //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-      //         if (index % 2 !== 0) {
-      //           return true;
-      //         }
-      //         return false;
-      //       });
-      //       this.setState({ selectedRowKeys: newSelectedRowKeys });
-      //     }
-      //   }
-      // ]
+      selectedRowKeys: this.state.selectedRowKeys,
+      onChange: (selectedRowKeys, selectedRows) => {
+        this.setState({
+          selectedRowKeys,
+        });
+      },
+    };
+
+    const sources = {
+      hd: {
+        // play_url: this.state.video,
+        play_url: this.state.play_url,
+        bitrate: 1,
+        duration: 1000,
+        format: "",
+        height: 500,
+        size: 160000,
+        width: 500,
+      },
     };
     return (
       <div>
@@ -279,11 +286,15 @@ class Chapter extends Component {
                 <PlusOutlined />
                 <span>新增</span>
               </Button>
-              <Button type="danger" style={{ marginRight: 10 }}>
+              <Button
+                type="danger"
+                style={{ marginRight: 10 }}
+                onClick={this.handleBatchDel}
+              >
                 <span>批量删除</span>
               </Button>
               <Tooltip title="全屏" className="course-table-btn">
-                <FullscreenOutlined />
+                <FullscreenOutlined onClick={() => screenfull.toggle()} />
               </Tooltip>
               <Tooltip title="刷新" className="course-table-btn">
                 <RedoOutlined />
@@ -320,8 +331,15 @@ class Chapter extends Component {
           visible={previewVisible}
           footer={null}
           onCancel={this.handleImgModal}
+          title="预览视频"
+          destroyOnClose={true}
         >
-          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+          <Player
+            sources={sources}
+            id={"1"}
+            cover={"http://localhost:3000/logo512.png"}
+            duration={1000}
+          ></Player>
         </Modal>
       </div>
     );
