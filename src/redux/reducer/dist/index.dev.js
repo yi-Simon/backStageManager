@@ -25,6 +25,8 @@ var _redux7 = require("@pages/Edu/Chapter/redux");
 
 var _redux8 = require("@pages/Edu/Course/redux");
 
+var _intl = _interopRequireDefault(require("./intl"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var _default = (0, _redux.combineReducers)({
@@ -36,7 +38,8 @@ var _default = (0, _redux.combineReducers)({
   menuList: _redux5.menuList,
   subjectList: _redux6.subjectList,
   chapter: _redux7.chapter,
-  courseList: _redux8.courseList
+  courseList: _redux8.courseList,
+  intlLanguage: _intl["default"]
 });
 
 exports["default"] = _default;

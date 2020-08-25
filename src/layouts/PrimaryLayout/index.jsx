@@ -17,6 +17,7 @@ import { logout } from "@redux/actions/login";
 import { resetUser } from "../../components/Authorized/redux";
 import logo from "@assets/images/logo.png";
 import { findPathIndex } from "@utils/tools";
+import { intl } from "@redux/actions/intl";
 
 // 引入组件公共样式
 import "@assets/css/common.less";
@@ -27,10 +28,12 @@ const { Header, Sider, Content } = Layout;
 @connect(
   (state) => ({
     user: state.user,
+    intlLanguage: state.intlLanguage,
   }),
   {
     logout,
     resetUser,
+    intl,
   }
 )
 @withRouter
@@ -131,6 +134,10 @@ class PrimaryLayout extends Component {
     );
   };
 
+  toggleIntl = (params) => {
+    console.log(params);
+    this.props.intl(params.key);
+  };
   render() {
     const { collapsed } = this.state;
     const {
@@ -141,6 +148,12 @@ class PrimaryLayout extends Component {
 
     const route = this.selectRoute(routes, pathname);
 
+    const intlMenu = (
+      <Menu selectedKeys={this.props.language} onClick={this.toggleIntl}>
+        <Menu.Item key="zh">中文</Menu.Item>
+        <Menu.Item key="en">英文</Menu.Item>
+      </Menu>
+    );
     return (
       <Layout className="layout">
         <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -169,9 +182,11 @@ class PrimaryLayout extends Component {
                     <span>{user.name}</span>
                   </span>
                 </Dropdown>
-                <span className="site-layout-lang">
-                  <GlobalOutlined />
-                </span>
+                <Dropdown overlay={intlMenu}>
+                  <span className="site-layout-lang">
+                    <GlobalOutlined />
+                  </span>
+                </Dropdown>
               </span>
             </span>
           </Header>

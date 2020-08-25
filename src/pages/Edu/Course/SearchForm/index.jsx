@@ -10,12 +10,6 @@ import "./index.less";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const { Option } = Select;
-connect(
-  (state) => ({
-    courseList: state.courseList,
-  }),
-  { getAllCourse }
-)(SearchForm);
 
 function SearchForm(props) {
   const [form] = Form.useForm();
@@ -87,7 +81,7 @@ function SearchForm(props) {
   };
 
   const onFinish = () => {
-    console.log(props);
+    props.getAllCourse();
   };
 
   const intl = useIntl();
@@ -136,4 +130,4 @@ function SearchForm(props) {
   );
 }
 
-export default SearchForm;
+export default connect(null, { getAllCourse })(SearchForm);

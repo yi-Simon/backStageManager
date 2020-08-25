@@ -3,7 +3,7 @@ import { reqGetCourseList } from "@api/edu/course";
 
 function getAllCouorseSync(data) {
   return {
-    typr: GET_ALL_COURSE,
+    type: GET_ALL_COURSE,
     data,
   };
 }

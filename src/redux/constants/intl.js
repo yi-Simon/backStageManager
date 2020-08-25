@@ -1,0 +1,1 @@
+export const INTL_LANGUAGE = "INTL_LANGUAGE";
