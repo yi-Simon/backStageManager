@@ -12,7 +12,7 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import { login } from "@redux/actions/login";
+import { login, mobileLogin } from "@redux/actions/login";
 
 import { reqGetVerifyCode } from "@api/acl/oauth";
 
@@ -38,30 +38,39 @@ const validator = (rule, value) => {
     return resolve();
   });
 };
-
+let LoginFlag = "user";
 function LoginForm(props) {
   let [downCount, setDownCout] = useState(5);
   let [isShowBtn, setisShowBtn] = useState(true);
   const [form] = Form.useForm();
 
-  const onFinish = ({ username, password }) => {
-    props.login(username, password).then((token) => {
-      // 登录成功
-      // console.log("登陆成功~");
-      // 持久存储token
-      localStorage.setItem("user_token", token);
-      props.history.replace("/");
-    });
-    // .catch(error => {
-    //   notification.error({
-    //     message: "登录失败",
-    //     description: error
-    //   });
-    // });
+  const handleTabChange = (key) => {
+    LoginFlag = key;
   };
+
+  const onFinish = ({ username, password }) => {
+    if (LoginFlag === "user") {
+      form.validateFields(["username", "password"]).then((res) => {
+        let { username, password, phone, verify } = res;
+        props.login(username, password).then((token) => {
+          localStorage.setItem("user_token", token);
+          props.history.replace("/");
+        });
+      });
+    } else if (LoginFlag === "phone") {
+      form.validateFields(["phone", "verify"]).then((res) => {
+        let { username, password, phone, verify } = res;
+        props.mobileLogin(phone, verify).then((token) => {
+          localStorage.setItem("user_token", token);
+          props.history.replace("/");
+        });
+      });
+    }
+  };
+
   const getCode = () => {
     form.validateFields(["phone"]).then(async (res) => {
-      await reqGetVerifyCode(res.phone);
+      // await reqGetVerifyCode(res.phone);
       message.success("验证成功");
       const timer = setInterval(() => {
         setDownCout(--downCount);
@@ -75,6 +84,10 @@ function LoginForm(props) {
     });
   };
 
+  const gitLogin = () => {
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=cd75798159da904a6624`;
+  };
+
   return (
     <>
       <Form
@@ -82,11 +95,12 @@ function LoginForm(props) {
         name="normal_login"
         className="login-form"
         initialValues={{ remember: true }}
-        onFinish={onFinish}
+        // onFinish={onFinish}
       >
         <Tabs
           defaultActiveKey="user"
           tabBarStyle={{ display: "flex", justifyContent: "center" }}
+          onChange={handleTabChange}
         >
           <TabPane tab="账户密码登陆" key="user">
             <Form.Item
@@ -171,8 +185,9 @@ function LoginForm(props) {
         <Form.Item>
           <Button
             type="primary"
-            htmlType="submit"
+            // htmlType="submit"
             className="login-form-button"
+            onClick={onFinish}
           >
             登陆
           </Button>
@@ -182,7 +197,7 @@ function LoginForm(props) {
             <Col span={16}>
               <span>
                 其他登陆方式
-                <GithubOutlined className="login-icon" />
+                <GithubOutlined className="login-icon" onClick={gitLogin} />
                 <WechatOutlined className="login-icon" />
                 <QqOutlined className="login-icon" />
               </span>
@@ -197,4 +212,4 @@ function LoginForm(props) {
   );
 }
 
-export default withRouter(connect(null, { login })(LoginForm));
+export default withRouter(connect(null, { login, mobileLogin })(LoginForm));

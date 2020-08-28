@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
+import { LOGIN_SUCCESS, REMOVE_TOKEN, MOBILE_TOKEN } from "../constants/login";
 
 const initToken = localStorage.getItem("user_token") || "";
 

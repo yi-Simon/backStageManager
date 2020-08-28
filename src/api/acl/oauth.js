@@ -11,3 +11,14 @@ export function reqGetVerifyCode(mobile) {
     },
   });
 }
+
+export function reqMobileLogin(mobile, code) {
+  return request({
+    url: `${BASE_URL}/mobile`,
+    method: "POST",
+    data: {
+      mobile,
+      code,
+    },
+  });
+}

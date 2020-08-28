@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.reqGetVerifyCode = reqGetVerifyCode;
+exports.reqMobileLogin = reqMobileLogin;
 
 var _request = _interopRequireDefault(require("@utils/request"));
 
@@ -17,6 +18,17 @@ function reqGetVerifyCode(mobile) {
     method: "POST",
     data: {
       mobile: mobile
+    }
+  });
+}
+
+function reqMobileLogin(mobile, code) {
+  return (0, _request["default"])({
+    url: "".concat(BASE_URL, "/mobile"),
+    method: "POST",
+    data: {
+      mobile: mobile,
+      code: code
     }
   });
 }

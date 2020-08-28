@@ -1,10 +1,38 @@
-import React from "react";
+"use strict";
 
-const Login = React.lazy(() => import("@pages/Login"));
-const NotFound = React.lazy(() => import("@pages/404"));
-const Oauth = React.lazy(() => import("@pages/Login/component"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.defaultRoutes = exports.constantRoutes = void 0;
 
-//#region
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+var Login = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require("@pages/Login"));
+  });
+});
+
+var NotFound = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require("@pages/404"));
+  });
+});
+
+var Oauth = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require("@pages/Login/component"));
+  });
+}); //#region
+
 /* export const asyncRoutes = [
 	{
 		path: "/acl",
@@ -192,32 +220,32 @@ const Oauth = React.lazy(() => import("@pages/Login/component"));
 	},
 ]; */
 //#endregion
-
 // 常量路由
-export const constantRoutes = [
-  {
-    path: "/login",
-    component: Login,
-    title: "登录",
-  },
-  {
-    path: "/oauth",
-    component: Oauth,
-    title: "git授权组件",
-  },
-  { path: "*", component: NotFound },
-];
 
+
+var constantRoutes = [{
+  path: "/login",
+  component: Login,
+  title: "登录"
+}, {
+  path: "/oauth",
+  component: Oauth,
+  title: "git授权组件"
+}, {
+  path: "*",
+  component: NotFound
+}];
 /**
  * 登录后 默认路由
  */
-export const defaultRoutes = [
-  // 首页
-  {
-    path: "/",
-    component: "Admin",
-    icon: "home",
-    name: "后台管理系统",
-  },
-  // { path: "*", redirect: "/404", component: NotFound, hidden: true }
+
+exports.constantRoutes = constantRoutes;
+var defaultRoutes = [// 首页
+{
+  path: "/",
+  component: "Admin",
+  icon: "home",
+  name: "后台管理系统"
+} // { path: "*", redirect: "/404", component: NotFound, hidden: true }
 ];
+exports.defaultRoutes = defaultRoutes;
